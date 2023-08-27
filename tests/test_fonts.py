@@ -4,12 +4,18 @@ import os
 from typing import BinaryIO
 from unittest import TestCase
 
-from pypsf import psf1
-from pypsf.psf2 import PSF2Font
+from pypsf.psf1 import PSF1Header
+from pypsf.psf2 import PSF2Font, PSF2Header
 
 
-class TestPSF2(TestCase):
-    def _test_file(self, path: str, stream: BinaryIO):
+def peek(stream: BinaryIO, n: int) -> bytes:
+    result = stream.read(n)
+    stream.seek(0)
+    return result
+
+
+class TestFonts(TestCase):
+    def _test_psf2(self, path: str, stream: BinaryIO):
         font = PSF2Font.read(stream)
 
         self.assertEqual(
@@ -41,8 +47,8 @@ class TestPSF2(TestCase):
                 continue
 
             with gzip.open(ROOT + path, "rb") as stream:
-                if stream.read(2) == psf1.PSF1_MAGIC:
-                    continue
-                stream.seek(0)
-
-                self._test_file(ROOT + path, stream)
+                if peek(stream, 2) == PSF1Header.MAGIC:
+                    # self._test_psf1()
+                    pass
+                elif peek(stream, 4) == PSF2Header.MAGIC:
+                    self._test_psf2(path, stream)

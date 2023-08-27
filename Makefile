@@ -1,8 +1,8 @@
 EXAMPLES = $(shell find examples/ -type f)
 
 all:
-	black .
-	isort .
+	python -m black .
+	python -m isort .
 
 $(EXAMPLES): all
 	PYTHONPATH=. python $@

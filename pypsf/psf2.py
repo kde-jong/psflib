@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import BinaryIO, Optional
 
-from pypsf.exceptions import InvalidDataException
+from .exceptions import InvalidDataException
 
 
 @dataclass
@@ -44,8 +44,8 @@ class PSF2Header:
 
 @dataclass
 class UnicodeDescription:
-    SEPARATOR = 0xFF
-    SEQUENCE_START = 0xFE
+    SEPARATOR = bytes([0xFF])
+    SEQUENCE_START = bytes([0xFE])
 
     symbols: str
     sequences: Optional[list[str]]
@@ -54,34 +54,34 @@ class UnicodeDescription:
     def read(cls, stream: BinaryIO):
         symbols = bytearray()
         while True:
-            byte = stream.read(1)[0]
+            byte = stream.read(1)
             if byte == cls.SEPARATOR:
                 return UnicodeDescription(symbols.decode("utf-8"), list())
             elif byte == cls.SEQUENCE_START:
                 break
             else:
-                symbols.append(byte)
+                symbols.append(byte[0])
 
         sequences = list()
         sequence = bytearray()
         while True:
-            byte = stream.read(1)[0]
+            byte = stream.read(1)
             if byte == cls.SEPARATOR or byte == cls.SEQUENCE_START:
                 sequences.append(sequence.decode("utf-8"))
                 sequence.clear()
             if byte == cls.SEPARATOR:
                 return UnicodeDescription(symbols.decode("utf-8"), sequences)
             elif byte != cls.SEQUENCE_START:
-                sequence.append(byte)
+                sequence.append(byte[0])
 
     def write(self, stream: BinaryIO):
         stream.write(self.symbols.encode("utf-8"))
 
         for seq in self.sequences:
-            stream.write(bytes([self.SEQUENCE_START]))
+            stream.write(self.SEQUENCE_START)
             stream.write(seq.encode("utf-8"))
 
-        stream.write(bytes([self.SEPARATOR]))
+        stream.write(self.SEPARATOR)
 
 
 @dataclass
