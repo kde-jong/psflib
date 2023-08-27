@@ -1,0 +1,1 @@
+PSF1_MAGIC = bytes([0x36, 0x04])
