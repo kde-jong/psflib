@@ -3,7 +3,7 @@ import gzip
 from pypsf.psf2 import PSF2Font
 
 SOURCE = "/usr/share/kbd/consolefonts/default8x16.psfu.gz"
-TARGET = "default8x16_reverse.psfu.gz"
+TARGET = "output/default8x16_reverse.psfu.gz"
 
 
 with gzip.open(SOURCE, "rb") as istream:

@@ -1,6 +1,7 @@
 EXAMPLES = $(shell find examples/ -type f)
 
 all:
+	mkdir -p output/
 	python -m black .
 	python -m isort .
 
