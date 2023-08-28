@@ -1,11 +1,14 @@
-EXAMPLES = $(shell find examples/ -type f)
+EXAMPLES = $(shell find examples/ -type f -a -name "*.py")
+SOURCES = $(shell find pypsf/ -type f -a -name "*.py")
 
-all:
+all: $(SOURCES)
+	python -m black -q .
+	python -m isort -q .
+
+prep:
 	mkdir -p output/
-	python -m black .
-	python -m isort .
 
-$(EXAMPLES): all
+$(EXAMPLES): all prep
 	PYTHONPATH=. python $@
 
 examples: $(EXAMPLES)

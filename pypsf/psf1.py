@@ -1,7 +1,7 @@
 from dataclasses import dataclass
-from typing import BinaryIO, Optional
+from typing import BinaryIO
 
-from .exceptions import InvalidDataException
+from .common import InvalidDataException, UnicodeDescription
 
 
 @dataclass
@@ -27,48 +27,11 @@ class PSF1Header:
         _write_uchar(stream, self.char_size)
 
 
-@dataclass
-class TableEntry:
+class PSF1UnicodeDescription(UnicodeDescription):
+    CHAR_SIZE = 2
+    CHAR_ENCODING = "utf-16-le"
     SEPARATOR = bytes([0xFF, 0xFF])
     SEQUENCE_START = bytes([0xFF, 0xFE])
-
-    symbols: str
-    sequences: list[str]
-
-    @classmethod
-    def read(cls, stream: BinaryIO):
-        symbols = bytearray()
-        while True:
-            data = stream.read(2)
-            if data == TableEntry.SEPARATOR:
-                return TableEntry(symbols.decode("utf-16-le"), list())
-            elif data == TableEntry.SEQUENCE_START:
-                break
-            else:
-                symbols.append(data[0])
-                symbols.append(data[1])
-
-        sequences = list()
-        sequence = bytearray()
-        while True:
-            data = stream.read(2)
-            if data == TableEntry.SEPARATOR or data == TableEntry.SEQUENCE_START:
-                sequences.append(sequence.decode("utf-16-le"))
-                sequence.clear()
-            if data == TableEntry.SEPARATOR:
-                return TableEntry(symbols.decode("utf-16-le"), sequences)
-            elif data != TableEntry.SEQUENCE_START:
-                sequence.append(data[0])
-                sequence.append(data[1])
-
-    def write(self, stream: BinaryIO):
-        stream.write(self.symbols.encode("utf-16-le"))
-
-        for seq in self.sequences:
-            stream.write(TableEntry.SEQUENCE_START)
-            stream.write(seq.encode("utf-16-le"))
-
-        stream.write(TableEntry.SEPARATOR)
 
 
 @dataclass
@@ -80,7 +43,7 @@ class PSF1Font:
 
     header: PSF1Header
     bitmaps: list[bytes]
-    unicode_table: list[TableEntry]
+    unicode_table: list[PSF1UnicodeDescription]
 
     @classmethod
     def read(cls, stream: BinaryIO):
@@ -98,9 +61,9 @@ class PSF1Font:
         if not header.mode & (PSF1Font.MODE_HAS_TABLE | PSF1Font.MODE_HAS_SEQUENCE):
             return PSF1Font(header, bitmaps, list())
 
-        unicode_table: list[TableEntry] = list()
+        unicode_table = list()
         for _ in range(length):
-            unicode_table.append(TableEntry.read(stream))
+            unicode_table.append(PSF1UnicodeDescription.read(stream))
 
         return PSF1Font(header, bitmaps, unicode_table)
 

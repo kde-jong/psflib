@@ -1,7 +1,7 @@
 from dataclasses import dataclass
-from typing import BinaryIO, Optional
+from typing import BinaryIO
 
-from .exceptions import InvalidDataException
+from .common import InvalidDataException, UnicodeDescription
 
 
 @dataclass
@@ -42,46 +42,11 @@ class PSF2Header:
         _write_uint(stream, self.width)
 
 
-@dataclass
-class TableEntry:
+class PSF2UnicodeDescription(UnicodeDescription):
+    CHAR_SIZE = 1
+    CHAR_ENCODING = "utf-8"
     SEPARATOR = bytes([0xFF])
     SEQUENCE_START = bytes([0xFE])
-
-    symbols: str
-    sequences: list[str]
-
-    @classmethod
-    def read(cls, stream: BinaryIO):
-        symbols = bytearray()
-        while True:
-            data = stream.read(1)
-            if data == TableEntry.SEPARATOR:
-                return TableEntry(symbols.decode("utf-8"), list())
-            elif data == TableEntry.SEQUENCE_START:
-                break
-            else:
-                symbols.append(data[0])
-
-        sequences = list()
-        sequence = bytearray()
-        while True:
-            data = stream.read(1)
-            if data == TableEntry.SEPARATOR or data == TableEntry.SEQUENCE_START:
-                sequences.append(sequence.decode("utf-8"))
-                sequence.clear()
-            if data == TableEntry.SEPARATOR:
-                return TableEntry(symbols.decode("utf-8"), sequences)
-            elif data != TableEntry.SEQUENCE_START:
-                sequence.append(data[0])
-
-    def write(self, stream: BinaryIO):
-        stream.write(self.symbols.encode("utf-8"))
-
-        for seq in self.sequences:
-            stream.write(TableEntry.SEQUENCE_START)
-            stream.write(seq.encode("utf-8"))
-
-        stream.write(TableEntry.SEPARATOR)
 
 
 @dataclass
@@ -92,7 +57,7 @@ class PSF2Font:
 
     header: PSF2Header
     bitmaps: list[bytes]
-    unicode_table: list[TableEntry]
+    unicode_table: list[PSF2UnicodeDescription]
 
     @classmethod
     def read(cls, stream: BinaryIO):
@@ -109,9 +74,9 @@ class PSF2Font:
         if not header.flags & PSF2Font.FLAG_HAS_TABLE:
             return PSF2Font(header, bitmaps, list())
 
-        unicode_table: list[TableEntry] = list()
+        unicode_table = list()
         for _ in range(header.length):
-            unicode_table.append(TableEntry.read(stream))
+            unicode_table.append(PSF2UnicodeDescription.read(stream))
 
         return PSF2Font(header, bitmaps, unicode_table)
 
