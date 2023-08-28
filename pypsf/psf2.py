@@ -88,6 +88,7 @@ class TableEntry:
 class PSF2Font:
     MAX_VERSION = 0
     FLAG_HAS_TABLE = 1 << 0
+    HEADER_SIZE = 32
 
     header: PSF2Header
     bitmaps: list[bytes]

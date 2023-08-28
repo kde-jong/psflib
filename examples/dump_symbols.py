@@ -9,14 +9,7 @@ TARGET = "output/default8x16_dump.json"
 with gzip.open(SOURCE, "rb") as istream:
     font = PSF2Font.read(istream)
 
-    data = [
-        {
-            "index": i,
-            "symbols": entry.symbols,
-            "sequences": entry.sequences,
-        }
-        for i, entry in enumerate(font.unicode_table)
-    ]
+    data = [entry.symbols for entry in font.unicode_table]
 
     with open(TARGET, "w") as ostream:
         json.dump(data, ostream, indent=4)
