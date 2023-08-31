@@ -1,0 +1,10 @@
+[tool.poetry]
+name = "PyPSF"
+version = "0.1.0"
+description = "A Python library for working with PC Screen Font files"
+authors = ["Kevin de Jong <kvdjong@gmail.com>"]
+include = ["pypsf"]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

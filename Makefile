@@ -1,7 +1,7 @@
 EXAMPLES = $(shell find examples/ -type f -a -name "*.py")
 SOURCES = $(shell find pypsf/ -type f -a -name "*.py")
 
-all: $(SOURCES)
+fmt: $(SOURCES)
 	python -m black -q .
 	python -m isort -q .
 
@@ -15,3 +15,5 @@ examples: $(EXAMPLES)
 
 test: all
 	python -m unittest tests/test_*.py
+
+.PHONY: fmt prep examples test
