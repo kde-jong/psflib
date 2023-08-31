@@ -4,8 +4,8 @@ import os
 from typing import BinaryIO
 from unittest import TestCase
 
-from pypsf.psf1 import PSF1Font, PSF1Header
-from pypsf.psf2 import PSF2Font, PSF2Header
+from psflib.psf1 import PSF1Font, PSF1Header
+from psflib.psf2 import PSF2Font, PSF2Header
 
 
 def peek(stream: BinaryIO, n: int) -> bytes:

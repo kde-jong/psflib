@@ -1,6 +1,6 @@
 import gzip
 
-from pypsf.psf2 import PSF2Font
+from psflib.psf2 import PSF2Font
 
 SOURCE = "/usr/share/kbd/consolefonts/default8x16.psfu.gz"
 TARGET = "output/default8x16_inverse.psfu.gz"

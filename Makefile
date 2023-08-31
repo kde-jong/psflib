@@ -1,5 +1,5 @@
 EXAMPLES = $(shell find examples/ -type f -a -name "*.py")
-SOURCES = $(shell find pypsf/ -type f -a -name "*.py")
+SOURCES = $(shell find psflib/ -type f -a -name "*.py")
 
 fmt: $(SOURCES)
 	python -m black -q .

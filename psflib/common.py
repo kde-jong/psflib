@@ -8,10 +8,10 @@ class InvalidDataException(Exception):
 
 @dataclass
 class UnicodeDescription:
-    CHAR_SIZE: int = field(init=False)
-    CHAR_ENCODING: str = field(init=False)
-    SEPARATOR: bytes = field(init=False)
-    SEQUENCE_START: bytes = field(init=False)
+    CHAR_SIZE: int = field(init=False, repr=False)
+    CHAR_ENCODING: str = field(init=False, repr=False)
+    SEPARATOR: bytes = field(init=False, repr=False)
+    SEQUENCE_START: bytes = field(init=False, repr=False)
 
     symbols: str
     sequences: list[str]
