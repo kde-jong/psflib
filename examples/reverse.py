@@ -6,24 +6,24 @@ SOURCE = "/usr/share/kbd/consolefonts/default8x16.psfu.gz"
 TARGET = "output/default8x16_reverse.psfu.gz"
 
 
-with gzip.open(SOURCE, "rb") as istream:
-    font = PSF2Font.read(istream)
+with gzip.open(SOURCE, "rb") as file:
+    font = PSF2Font.read(file)
 
-    for i in range(len(font.bitmaps)):
-        old = font.bitmaps[i]
-        new = bytearray(old)
-        size = font.header.width * font.header.height
+size = font.header.width * font.header.height
+for i in range(len(font.bitmaps)):
+    old = font.bitmaps[i]
+    new = bytearray(old)
 
-        for idx in range(size):
-            opposite_idx = size - idx - 1
-            value = old[opposite_idx // 8] & (1 << (opposite_idx % 8)) != 0
+    for idx in range(size):
+        opposite_idx = size - idx - 1
+        value = old[opposite_idx // 8] & (1 << (opposite_idx % 8)) != 0
 
-            if value:
-                new[idx // 8] |= 1 << (idx % 8)
-            else:
-                new[idx // 8] &= ~(1 << (idx % 8))
+        if value:
+            new[idx // 8] |= 1 << (idx % 8)
+        else:
+            new[idx // 8] &= ~(1 << (idx % 8))
 
-        font.bitmaps[i] = bytes(new)
+    font.bitmaps[i] = bytes(new)
 
-    with gzip.open(TARGET, "wb") as ostream:
-        font.write(ostream)
+with gzip.open(TARGET, "wb") as file:
+    font.write(file)
