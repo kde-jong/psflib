@@ -8,12 +8,12 @@ fmt: $(SOURCES)
 prep:
 	mkdir -p output/
 
-$(EXAMPLES): all prep
+$(EXAMPLES): fmt prep
 	PYTHONPATH=. python $@
 
 examples: $(EXAMPLES)
 
-test: all
+test: fmt
 	python -m unittest tests/test_*.py
 
 .PHONY: fmt prep examples test
